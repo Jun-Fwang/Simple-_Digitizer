@@ -1,0 +1,35 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest 
+
+    steps:
+    - name: 1. 내 저장소의 코드 가져오기
+      uses: actions/checkout@v4
+
+    - name: 2. 파이썬 설치하기
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # ── 이 부분이 변경되었습니다 ──
+    - name: 3. requirements.txt를 통해 라이브러리 일괄 설치
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 4. 파이썬 코드를 exe 파일로 변환
+      # 주의: Simple_Digitizer.py 부분을 깃허브에 올리신 실제 파이썬 파일 이름으로 변경해주세요. (예: main.py)
+      run: pyinstaller --noconsole --onefile Simple_Digitizer.py
+
+    - name: 5. 완성된 exe 파일을 결과물(Artifact)로 업로드
+      uses: actions/upload-artifact@v4
+      with:
+        name: Professional-Digitizer
+        path: dist/*.exe
